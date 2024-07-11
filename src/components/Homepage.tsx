@@ -39,9 +39,12 @@ export default function Homepage() {
         <h1 className="text-2xl">Entertainment Finder</h1>
         <div style={chatWrapper}>
           <div style={chatHistoryContainer}>
-            {chatHistory.map((message, index) => (
-              <p key={index}>{message}</p>
-            ))}
+          {chatHistory.map((message, index) => (
+            <p key={index} style={index % 2 === 0 ? leftText : rightText}>
+              {message}
+            </p>
+          ))}
+
           </div>
           <div style={chatMessage}>
             <input 
@@ -127,4 +130,14 @@ const chatSendButton = {
   padding: '.5rem',
   borderRadius: '.5rem',
   margin: '.5rem',
+}
+
+const leftText = {
+  textAlign: 'left',
+  paddingBottom: '1rem',
+}
+
+const rightText = {
+  textAlign: 'right',
+  paddingBottom: '1rem',
 }
