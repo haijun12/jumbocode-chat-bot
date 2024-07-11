@@ -59,31 +59,6 @@ export default function Homepage() {
           </div>
         </div>
 
-        {/* <p>Pages: </p> */}
-        {/* <ul className="list-disc ml-8 mb-4">
-          <Link href="/" className="list-item text-blue-500">
-            Homepage
-          </Link>
-          <Link href="/users/Gabe" className="list-item text-blue-500">
-            Gabe's User Page
-          </Link>
-          <Link href="/users/Ben" className="list-item text-blue-500">
-            Ben's User Page
-          </Link>
-        </ul>
-
-        <p>API Routes: </p>
-        <ul className="list-disc ml-8 mb-4">
-          <a href="/api/hello" className="list-item text-blue-500">
-            /api/hello
-          </a>
-          <a href="/api/users?name=Gabe" className="list-item text-blue-500">
-            /api/users?name=Gabe
-          </a>
-          <a href="/api/users?name=Ben" className="list-item text-blue-500">
-            /api/users?name=Ben
-          </a>
-        </ul> */}
       </div>
     </>
   );
@@ -134,10 +109,20 @@ const chatSendButton = {
 
 const leftText = {
   textAlign: 'left',
-  paddingBottom: '1rem',
+  padding: '.3rem',
+  margin: '.5rem',
+  backgroundColor: 'lightgrey',
+  borderRadius: '5px',
+  border: '1px solid #ccc',
+  minHeight: '3rem',
 }
 
 const rightText = {
   textAlign: 'right',
-  paddingBottom: '1rem',
+  padding: '.3rem',
+  margin: '.5rem',
+  backgroundColor: 'lightblue',
+  borderRadius: '5px',
+  border: '1px solid #ccc',
+  minHeight: '3rem',
 }
