@@ -1,13 +1,15 @@
 // import { Link } from "wouter";
 import { useEffect, useState } from "react";
+import DateFormat from "../utils/DateFormat";
 
 export default function Homepage() {
   const [searchMessage, setSearchMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<string[]>([]);
-
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  var date = new Date();
+  var dateString = DateFormat(date);
   const handleSend = async () => {
     if (searchMessage.trim() === "") return;
-    setChatHistory((prevHistory) => [...prevHistory, searchMessage]);
+    setChatHistory([...chatHistory, { message: searchMessage, date: dateString }]);
     setSearchMessage("");
     const tempMessage = searchMessage;
     let response = await fetch("/api/getResponse", {
@@ -17,10 +19,24 @@ export default function Homepage() {
       },
       body: JSON.stringify({
         message: tempMessage,
+        date: dateString,
       }),
     });
     let data = await response.json();
-    setChatHistory((prevHistory) => [...prevHistory, data]);
+    console.log(data);
+    setChatHistory(data);
+  }
+
+  const handleClearHistory = async() => {
+    const response = await fetch('/api/getResponse', {
+      method: 'DELETE',
+      body: JSON.stringify({ message: "clear history" }),
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    });
+    let data = await response.json();
+    setChatHistory(data);
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -39,9 +55,9 @@ export default function Homepage() {
         <h1 className="text-2xl">Entertainment Finder</h1>
         <div style={chatWrapper}>
           <div style={chatHistoryContainer}>
-          {chatHistory.map((message, index) => (
+          {chatHistory.map((chatMessage, index) => (
             <p key={index} style={index % 2 === 0 ? leftText : rightText}>
-              {message}
+              {chatMessage.message}
             </p>
           ))}
 
@@ -57,8 +73,8 @@ export default function Homepage() {
               />
             <button style= {chatSendButton} onClick = {handleSend}>Send</button>
           </div>
+          <button style= {chatSendButton} onClick = {handleClearHistory}>Clear History</button>
         </div>
-
       </div>
     </>
   );
