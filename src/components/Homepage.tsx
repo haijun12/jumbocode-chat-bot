@@ -77,7 +77,7 @@ const chatWrapper = {
 
 const chatHistoryContainer = {
   flexGrow: '1',
-  overflow: 'scroll',
+  overflow: 'auto',
   padding: '1rem',
 };
 
@@ -108,7 +108,7 @@ const chatSendButton = {
 }
 
 const leftText = {
-  textAlign: 'left',
+  textAlign: 'left' as 'left',
   padding: '.3rem',
   margin: '.5rem',
   backgroundColor: 'lightgrey',
@@ -118,7 +118,7 @@ const leftText = {
 }
 
 const rightText = {
-  textAlign: 'right',
+  textAlign: 'right' as 'right',
   padding: '.3rem',
   margin: '.5rem',
   backgroundColor: 'lightblue',
