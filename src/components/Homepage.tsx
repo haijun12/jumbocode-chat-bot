@@ -36,6 +36,7 @@ export default function Homepage() {
       }
     });
     let data = await response.json();
+    console.log(data);
     setChatHistory(data);
   }
 
@@ -48,6 +49,20 @@ export default function Homepage() {
   useEffect(() => {
     console.log(chatHistory);
   }, [chatHistory]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch('/api/getResponse', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+      });
+      let data = await response.json();
+      setChatHistory(data);
+    }
+    fetchData();
+  },[])
 
   return (
     <>

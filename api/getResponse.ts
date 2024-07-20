@@ -1,18 +1,16 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+// import { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from "@vercel/postgres";
-// import DateFormat from "../src/utils/DateFormat";
 
-let token: string;
+let token: string | null = null;
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log(req.method)
-  console.log(req.body)
-  if (req.method == 'POST') {
-    const userMessage = req.body.message;
-    const userDate = req.body.date;
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const userMessage = body.message;
+    const userDate = body.date;
 
-    try {
-      // First fetch request to login and obtain token
+    // Obtain token if not already present
+    if (!token) {
       const loginResponse = await fetch("https://tl-onboarding-project-dxm7krgnwa-uc.a.run.app/login", {
         method: "POST",
         headers: {
@@ -29,67 +27,105 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const loginData = await loginResponse.json();
-      console.log('Login response data:', loginData);
-
       if (!loginData.token) {
         throw new Error('No token found!');
       }
 
       token = loginData.token;
-
-      // Second fetch request to prompt using the obtained token
-      const promptResponse = await fetch("https://tl-onboarding-project-dxm7krgnwa-uc.a.run.app/prompt", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: "Bearer " + token,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o",
-          messages: [{
-            role: "user",
-            content: "Your main job is to find entertainment. Find out what the user is looking for, and then provide the appropriate entertainment. Keep the responses short." + userMessage
-          }]
-        })
-      });
-
-      if (!promptResponse.ok) {
-        throw new Error(`HTTP error! status: ${promptResponse.status}`);
-      }
-
-      const promptData = await promptResponse.json();
-      console.log('Prompt response data:', promptData);
-
-      if (!promptData) {
-        throw new Error('No data received from prompt endpoint!');
-      }
-
-      await addToDatabase(userMessage, userDate);
-      await addToDatabase(promptData.message.content, DateFormat(new Date()));
-      let chatHistory = await getDatebase();
-
-      res.status(200).json(chatHistory.reverse());
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
     }
-  } else if (req.method == 'DELETE') {
-    console.log("DELETE");
-    let chatHistory = await deleteFromDatabase();
-    res.status(200).json(chatHistory);
-  } else {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+
+    // Fetch prompt
+    const promptResponse = await fetch("https://tl-onboarding-project-dxm7krgnwa-uc.a.run.app/prompt", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [{
+          role: "user",
+          content: "Your main job is to find entertainment. Find out what the user is looking for, and then provide the appropriate entertainment. Keep the responses short." + userMessage
+        }]
+      })
+    });
+
+    if (!promptResponse.ok) {
+      throw new Error(`HTTP error! status: ${promptResponse.status}`);
+    }
+
+    const promptData = await promptResponse.json();
+    if (!promptData) {
+      throw new Error('No data received from prompt endpoint!');
+    }
+
+    await addToDatabase(userMessage, userDate);
+    await addToDatabase(promptData.message.content, DateFormat(new Date()));
+
+    const chatHistory = await getDatebase();
+    return new Response(JSON.stringify(chatHistory.reverse()), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 }
 
+export async function DELETE() {
+  try {
+    let chatHistory = await deleteFromDatabase();
+    return new Response(JSON.stringify(chatHistory), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+}
 
+export async function GET() {
+  try {
+    const chatHistory = await getDatebase();
+    return new Response(JSON.stringify(chatHistory), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+}
 
 const addToDatabase = async (message: string, date: string) => {
   const result = await sql`
-        INSERT INTO jumbocode_chat_history (time, message)
-        VALUES (${date}, ${message})
-        RETURNING *;
-      `;
+    INSERT INTO jumbocode_chat_history (time, message)
+    VALUES (${date}, ${message})
+    RETURNING *;
+  `;
   return result.rows[0];
 }
 

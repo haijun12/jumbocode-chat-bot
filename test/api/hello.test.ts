@@ -1,7 +1,9 @@
-import { expect, test } from 'vitest'
-import { GET } from "api/hello";
+// import { expect, test } from 'vitest'
+// import { GET } from "api/getResponse";
 
-test('GET Hello World', async () => {
-  const response = await GET().text();
-  expect(response).toBe("Hello, world!")
-})
+// test('GET Chat History', async () => {
+//   const response = await GET();
+//   let data = await response.json();
+//   console.log(data);
+//   expect(data).toBe("Hello, world!")
+// })

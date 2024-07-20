@@ -13,5 +13,11 @@ export default defineConfig({
       extension: ".ts",
       target: ["html", "txt"]
     }
-  }
+  },
+  html: {
+    inject: {
+      injectTo: 'head',
+      tag: '<link rel="icon" href="/favicon.ico" />',
+    },
+  },
 });
