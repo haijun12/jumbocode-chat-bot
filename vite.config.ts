@@ -11,7 +11,8 @@ export default defineConfig({
     coverage: {
       provider: "istanbul",
       extension: ".ts",
-      target: ["html", "txt"]
+      target: ["html", "txt"],
+      setupFiles: ['dotenv/config']
     }
   },
   html: {

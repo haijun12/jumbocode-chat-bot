@@ -1,9 +1,12 @@
 // import { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from "@vercel/postgres";
+import dotenv from 'dotenv'
+dotenv.config()
 
 let token: string | null = null;
 
 export async function POST(request: Request) {
+  console.log("IN GET RESPONSE", process.env.POSTGRES_URL);
   try {
     const body = await request.json();
     const userMessage = body.message;
@@ -62,7 +65,7 @@ export async function POST(request: Request) {
     await addToDatabase(userMessage, userDate);
     await addToDatabase(promptData.message.content, DateFormat(new Date()));
 
-    const chatHistory = await getDatebase();
+    const chatHistory = await getDatabase();
     return new Response(JSON.stringify(chatHistory.reverse()), {
       status: 200,
       headers: {
@@ -101,8 +104,9 @@ export async function DELETE() {
 }
 
 export async function GET() {
+  console.log("IN GET RESPONSE", process.env.VITE_POSTGRES_URL);
   try {
-    const chatHistory = await getDatebase();
+    const chatHistory = await getDatabase();
     return new Response(JSON.stringify(chatHistory), {
       status: 200,
       headers: {
@@ -129,7 +133,7 @@ const addToDatabase = async (message: string, date: string) => {
   return result.rows[0];
 }
 
-const getDatebase = async () => {
+const getDatabase = async () => {
   const result = await sql`
     SELECT * FROM jumbocode_chat_history
     ORDER BY time DESC
@@ -142,7 +146,7 @@ const deleteFromDatabase = async () => {
   const result = await sql`
     DELETE FROM jumbocode_chat_history;
   `;
-  console.log("RESULT", result);
+  // console.log("RESULT", result);
   return result.rows;
 }
 
