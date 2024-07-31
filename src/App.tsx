@@ -1,27 +1,32 @@
 import Homepage from "./components/Homepage";
 import Login from "./components/Login";
-import { Route, Switch, Redirect } from "wouter";
-import { useState } from "react";
+import { Route, Switch, useLocation } from "wouter";
+import { useState, useEffect } from "react";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  return (
-    <>
-      <Switch>
-        
-        <Route path="/">
-          {isLoggedIn ? <Homepage /> : <Redirect to="/login" />}
-        </Route>
-        <Route path="/login">
-          {isLoggedIn ? <Redirect to="/" /> : <Login setIsLoggedIn={setIsLoggedIn} />}
-        </Route>
+  const [location, setLocation] = useLocation();
 
-        {/* Shows a 404 error if the path doesn't match anything */}
-        <Route path="*">
-          <p className="p-4">404: Page Not Found</p>
-        </Route>
-      </Switch>
-    </>
+  useEffect(() => {
+    if (!isLoggedIn && location !== "/login") {
+      setLocation("/login");
+    } else if (isLoggedIn && location === "/login") {
+      setLocation("/");
+    }
+  }, [isLoggedIn, location, setLocation]);
+
+  return (
+    <Switch>
+      <Route path="/">
+        <Homepage />
+      </Route>
+      <Route path="/login">
+        <Login setIsLoggedIn={setIsLoggedIn} />
+      </Route>
+      <Route>
+        <p className="p-4">404: Page Not Found</p>
+      </Route>
+    </Switch>
   );
 };
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import DateFormat from "../utils/DateFormat";
 
 export default function Homepage() {
   const [searchMessage, setSearchMessage] = useState("");
@@ -28,12 +27,11 @@ export default function Homepage() {
       });
 
       let data = await response.json();
-      console.log(data);
       setChatHistory(data);
     } catch (error) {
       console.error("Error fetching response:", error);
     } finally {
-      setLoading(false); // Set loading to false when request is complete
+      setLoading(false);
     }
   };
 
@@ -46,8 +44,8 @@ export default function Homepage() {
       }
     });
     let data = await response.json();
-    console.log(data);
     setChatHistory(data);
+    alert("History cleared!");
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -72,7 +70,7 @@ export default function Homepage() {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center bg-gray-100 h-screen">
+      <div className="flex flex-col justify-center items-center bg-gray-100 h-dvh">
         <h1 className="text-2xl">Entertainment Finder</h1>
         <div style={chatWrapper}>
           <div style={chatHistoryContainer}>
