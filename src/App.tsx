@@ -1,7 +1,7 @@
 import Homepage from "./components/Homepage";
 import Login from "./components/Login";
 import { Route, Switch, Redirect } from "wouter";
-import {useState} from "react";
+import { useState } from "react";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

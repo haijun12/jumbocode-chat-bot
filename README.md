@@ -22,3 +22,4 @@ To get the template up and running:
 Vitest tests are included in the `test` folder. You can run them with `npm run test` and generate a test coverage report with `npm run coverage`.
 
 The template configured to run tests only on files ending in `.ts` (only the backend files). You can run tests on the frontend by deleting `extension: ".ts"` in `vite.config.ts`.
+
