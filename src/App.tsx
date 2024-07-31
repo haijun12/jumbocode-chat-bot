@@ -17,11 +17,9 @@ const App = () => {
         </Route>
 
         {/* Shows a 404 error if the path doesn't match anything */}
-        {
-          <Route>
-            <p className="p-4">404: Page Not Found</p>
-          </Route>
-        }
+        <Route path="*">
+          <p className="p-4">404: Page Not Found</p>
+        </Route>
       </Switch>
     </>
   );

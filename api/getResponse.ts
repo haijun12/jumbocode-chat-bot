@@ -61,9 +61,10 @@ export async function POST(request: Request) {
     if (!promptData) {
       throw new Error('No data received from prompt endpoint!');
     }
-
+    console.log("user date: ", userDate);
+    console.log("chatbot date:", new Date().toUTCString());
     await addToDatabase(userMessage, userDate);
-    await addToDatabase(promptData.message.content, DateFormat(new Date()));
+    await addToDatabase(promptData.message.content, new Date().toUTCString());
 
     const chatHistory = await getDatabase();
     return new Response(JSON.stringify(chatHistory.reverse()), {
@@ -150,25 +151,25 @@ const deleteFromDatabase = async () => {
   return result.rows;
 }
 
-function DateFormat(date: Date | null) {
-  if (!date) {
-    return 'Loading...';
-  }
-  let period = "am";
-  let hours = date.getHours().toString().padStart(2, '0');
-  if (parseInt(hours) > 12) {
-    hours = String(parseInt(hours) - 12);
-    period = "pm";
-  }
+// function DateFormat(date: Date | null) {
+//   if (!date) {
+//     return 'Loading...';
+//   }
+//   let period = "am";
+//   let hours = date.getHours().toString().padStart(2, '0');
+//   if (parseInt(hours) > 12) {
+//     hours = String(parseInt(hours) - 12);
+//     period = "pm";
+//   }
 
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
+//   const minutes = date.getMinutes().toString().padStart(2, '0');
+//   const seconds = date.getSeconds().toString().padStart(2, '0');
 
-  const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const dayOfWeek = daysOfWeek[date.getDay()];
-  const month = date.toLocaleString('en-US', { month: 'short' });
-  const day = date.getDate();
-  const year = date.getFullYear();
+//   const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+//   const dayOfWeek = daysOfWeek[date.getDay()];
+//   const month = date.toLocaleString('en-US', { month: 'short' });
+//   const day = date.getDate();
+//   const year = date.getFullYear();
 
-  return `${month} ${day}, ${year} | ${dayOfWeek} ${hours}:${minutes}:${seconds} ${period}`;
-}
+//   return `${month} ${day}, ${year} | ${dayOfWeek} ${hours}:${minutes}:${seconds} ${period}`;
+// }

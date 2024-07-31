@@ -1,33 +1,43 @@
-// import { Link } from "wouter";
 import { useEffect, useState } from "react";
-import DateFormat from "../utils/DateFormat";
+// import DateFormat from "../utils/DateFormat";
 
 export default function Homepage() {
   const [searchMessage, setSearchMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<any[]>([]);
-  var date = new Date();
-  var dateString = DateFormat(date);
+  const [loading, setLoading] = useState(false); // State to track loading
+
   const handleSend = async () => {
     if (searchMessage.trim() === "") return;
-    setChatHistory([...chatHistory, { message: searchMessage, date: dateString }]);
-    setSearchMessage("");
+    let date = new Date().toUTCString();
     const tempMessage = searchMessage;
-    let response = await fetch("/api/getResponse", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: tempMessage,
-        date: dateString,
-      }),
-    });
-    let data = await response.json();
-    console.log(data);
-    setChatHistory(data);
-  }
+    setChatHistory([...chatHistory, { message: searchMessage, date: date }]);
+    setSearchMessage("");
+    
+    setLoading(true); // Set loading to true
 
-  const handleClearHistory = async() => {
+    try {
+      let response = await fetch("/api/getResponse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: tempMessage,
+          date: date,
+        }),
+      });
+
+      let data = await response.json();
+      console.log(data);
+      setChatHistory(data);
+    } catch (error) {
+      console.error("Error fetching response:", error);
+    } finally {
+      setLoading(false); // Set loading to false when request is complete
+    }
+  };
+
+  const handleClearHistory = async () => {
     const response = await fetch('/api/getResponse', {
       method: 'DELETE',
       body: JSON.stringify({ message: "clear history" }),
@@ -38,17 +48,13 @@ export default function Homepage() {
     let data = await response.json();
     console.log(data);
     setChatHistory(data);
-  }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSend();
     }
-  }
-
-  useEffect(() => {
-    console.log(chatHistory);
-  }, [chatHistory]);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -62,7 +68,7 @@ export default function Homepage() {
       setChatHistory(data);
     }
     fetchData();
-  },[])
+  }, []);
 
   return (
     <>
@@ -70,25 +76,31 @@ export default function Homepage() {
         <h1 className="text-2xl">Entertainment Finder</h1>
         <div style={chatWrapper}>
           <div style={chatHistoryContainer}>
-          {chatHistory.map((chatMessage, index) => (
-            <p key={index} style={index % 2 === 0 ? leftText : rightText}>
-              {chatMessage.message}
-            </p>
-          ))}
-
+            {chatHistory.map((chatMessage, index) => (
+              <p key={index} style={index % 2 === 0 ? leftText : rightText}>
+                {chatMessage.message}
+              </p>
+            ))}
           </div>
           <div style={chatMessage}>
             <input 
-              style ={chatInput}
+              style={chatInput}
               type="text" 
               placeholder="Find Entertainment!" 
-              value = {searchMessage} 
+              value={searchMessage} 
               onChange={(e) => setSearchMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              />
-            <button style= {chatSendButton} onClick = {handleSend}>Send</button>
+              disabled={loading}
+            />
+            <button 
+              style={chatSendButton} 
+              onClick={handleSend} 
+              disabled={loading}
+            >
+              Send
+            </button>
           </div>
-          <button style= {chatSendButton} onClick = {handleClearHistory}>Clear History</button>
+          <button style={chatSendButton} onClick={handleClearHistory}>Clear History</button>
         </div>
       </div>
     </>
