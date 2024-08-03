@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function Homepage() {
   const [searchMessage, setSearchMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false); // State to track loading
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     if (searchMessage.trim() === "") return;
@@ -12,7 +12,7 @@ export default function Homepage() {
     setChatHistory([...chatHistory, { message: searchMessage, date: date }]);
     setSearchMessage("");
     
-    setLoading(true); // Set loading to true
+    setLoading(true);
 
     try {
       let response = await fetch("/api/getResponse", {
@@ -28,6 +28,7 @@ export default function Homepage() {
 
       let data = await response.json();
       setChatHistory(data);
+      console.log(chatHistory);
     } catch (error) {
       console.error("Error fetching response:", error);
     } finally {
@@ -63,6 +64,7 @@ export default function Homepage() {
         }
       });
       let data = await response.json();
+      console.log(data);
       setChatHistory(data);
     }
     fetchData();

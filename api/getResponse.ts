@@ -104,7 +104,7 @@ export async function DELETE() {
 export async function GET() {
   try {
     const chatHistory = await getDatabase();
-    return new Response(JSON.stringify(chatHistory), {
+    return new Response(JSON.stringify(sortMessagesByDate(chatHistory)), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -143,4 +143,12 @@ const deleteFromDatabase = async () => {
     DELETE FROM jumbocode_chat_history;
   `;
   return result.rows;
+}
+
+function sortMessagesByDate(messages: any): any {
+  return messages.sort((a: any, b: any) => {
+    const dateA = new Date(a.time);
+    const dateB = new Date(b.time);
+    return dateA.getTime() - dateB.getTime();
+  });
 }
