@@ -35,7 +35,12 @@ export async function POST(request: Request) {
 
       token = loginData.token;
     }
-
+    await addToDatabase(userMessage, userDate);
+    let chatHistory = (await getDatabase()).reverse();
+    const messageHistory = chatHistory.map((entry, index) => ({
+      role: index % 2 === 0 ? "user" : "assistant",
+      content: entry.message
+    }));
     // Fetch prompt
     const promptResponse = await fetch("https://tl-onboarding-project-dxm7krgnwa-uc.a.run.app/prompt", {
       method: "POST",
@@ -45,10 +50,13 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: "gpt-4o",
-        messages: [{
-          role: "user",
-          content: "Your main job is to find entertainment. Find out what the user is looking for, and then provide the appropriate entertainment. Keep the responses short." + userMessage
-        }]
+        messages: [
+          {
+            role: "system",
+            content: "Your main job is to find entertainment. Find out what the user is looking for, and then provide the appropriate entertainment. Keep the responses short."
+          },
+          ...messageHistory
+        ]
       })
     });
 
@@ -60,10 +68,9 @@ export async function POST(request: Request) {
     if (!promptData) {
       throw new Error('No data received from prompt endpoint!');
     }
-    await addToDatabase(userMessage, userDate);
     await addToDatabase(promptData.message.content, new Date().toUTCString());
 
-    const chatHistory = await getDatabase();
+    chatHistory = await getDatabase();
     return new Response(JSON.stringify(chatHistory.reverse()), {
       status: 200,
       headers: {
